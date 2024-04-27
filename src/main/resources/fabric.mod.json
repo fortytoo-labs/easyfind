@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "easyfind",
+  "version": "${version}",
+  "name": "EasyFind",
+  "description": "Spotlight for the Creative Inventory",
+  "authors": [
+    "sorae42"
+  ],
+  "contact": {
+    "repo": "https://github.com/sorae42/easyfind"
+  },
+  "license": "MIT",
+  "icon": "assets/easyfind/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.fortytoo.easyfind.easyfind.client.EasyFindClient"
+    ],
+    "main": [
+      "net.fortytoo.easyfind.easyfind.EasyFind"
+    ]
+  },
+  "mixins": [
+    "easyfind.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
