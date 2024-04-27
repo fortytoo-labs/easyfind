@@ -7,12 +7,9 @@ import net.fortytoo.easyfind.easyfind.screens.Spotlight;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EasyFindClient implements ClientModInitializer {
     private static KeyBinding openEFS;
-    public static final Logger LOGGER = LoggerFactory.getLogger("EFSpotlight");
     
     @Override
     public void onInitializeClient() {
@@ -25,7 +22,7 @@ public class EasyFindClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openEFS.wasPressed()) {
-                if (client.player != null) {
+                if (client.player != null && client.player.getAbilities().creativeMode) {
                     client.setScreen(new Spotlight());
                 }
             }
