@@ -11,8 +11,8 @@ public class FuzzyFind {
         return FuzzySearch.extractTop(
                 query,
                 itemList,
-                10,
-                10
+                20,
+                50
         );
     }
 }
