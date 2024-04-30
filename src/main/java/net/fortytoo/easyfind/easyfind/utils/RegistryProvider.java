@@ -6,24 +6,21 @@ import net.minecraft.registry.Registries;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class RegistryProvider {
-    private final Collection<String> items = new ArrayList<>();
 
-    public RegistryProvider() {
-        // FIXME: Any better approach here?
-        load();
-    }
+    private static final Collection<String> ITEMS;
 
-    public Collection<String> getItems() {
-        return Collections.unmodifiableCollection(items);
-    }
-
-    // TODO
-    private void load() {
-        items.clear();
+    static {
+        List<String> items = new ArrayList<>();
         for (Item item : Registries.ITEM) {
             items.add(item.getTranslationKey());
         }
+        ITEMS = Collections.unmodifiableCollection(items);
+    }
+
+    public static Collection<String> getItems() {
+        return ITEMS;
     }
 }
