@@ -28,7 +28,7 @@ public class Result extends AlwaysSelectedEntryListWidget.Entry<Result> {
     @Override
     public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
         // final int itemWidth = this.textRenderer.getWidth(this.item);
-        final String strgen = this.score + " - " + this.item;
+        final Text strgen = Text.translatable(this.item);
         context.drawText(this.textRenderer, strgen, x, y, Color.WHITE.getRGB(), false);
     }
 }
