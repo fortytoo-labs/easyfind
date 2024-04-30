@@ -2,29 +2,33 @@ package net.fortytoo.easyfind.easyfind.screens;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fortytoo.easyfind.easyfind.screens.widgets.Result;
-import net.fortytoo.easyfind.easyfind.screens.widgets.ResultList;
-import net.fortytoo.easyfind.easyfind.screens.widgets.Searchbox;
+import net.fortytoo.easyfind.easyfind.screens.widgets.ResultListWidget;
+import net.fortytoo.easyfind.easyfind.screens.widgets.ResultWidget;
+import net.fortytoo.easyfind.easyfind.screens.widgets.SearchboxWidget;
 import net.fortytoo.easyfind.easyfind.utils.FuzzyFind;
+import net.fortytoo.easyfind.easyfind.utils.LogUtil;
 import net.fortytoo.easyfind.easyfind.utils.RegistryProvider;
+import net.fortytoo.easyfind.easyfind.utils.SearchResult;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 @Environment(EnvType.CLIENT)
 public class Spotlight extends Screen {
-    private RegistryProvider registryProvider;
-    
-    private Searchbox searchbox;
-    private ResultList resultList;
+    private SearchboxWidget searchboxWidget;
+    private ResultListWidget resultListWidget;
+
+    private ServerPlayerEntity player;
     
     private final int inputHeight = 16;
     private String prevQuery;
     
-    
     public Spotlight() {
         super(Text.translatable("efs.title"));
-        // FIXME: Do not create a new instance of this.
-        registryProvider = new RegistryProvider();
     }
     
     @Override
@@ -46,7 +50,7 @@ public class Spotlight extends Screen {
         final int resultBoxX = super.width / 2 - resultBoxWidth / 2;
         final int resultBoxY = super.height / 6 + inputHeight + 1;
         
-        this.searchbox = new Searchbox(
+        this.searchboxWidget = new SearchboxWidget(
                 this,
                 super.textRenderer,
                 searchFieldX,
@@ -57,19 +61,25 @@ public class Spotlight extends Screen {
                 Text.translatable("efs.placeholder")
         );
         
-        this.searchbox.setChangedListener(this::search);
-        this.setFocused(this.searchbox);
-        super.addDrawableChild(this.searchbox);
+        this.searchboxWidget.setChangedListener(this::search);
+        this.searchboxWidget.setResultConsumer((result, entry) -> {
+            if (Objects.requireNonNull(result) == SearchResult.EXECUTE) {
+                this.giveItem();
+            }
+        });
+        
+        this.setFocused(this.searchboxWidget);
+        super.addDrawableChild(this.searchboxWidget);
         
         // Item Lists
-        resultList = new ResultList(
+        resultListWidget = new ResultListWidget(
                 super.client,
                 resultBoxWidth,
                 resultBoxHeight,
                 resultBoxY
         );
-        resultList.setX(resultBoxX);
-        super.addDrawableChild(resultList);
+        resultListWidget.setX(resultBoxX);
+        super.addDrawableChild(resultListWidget);
         
         this.updateResults();
     }
@@ -78,11 +88,12 @@ public class Spotlight extends Screen {
         if (this.prevQuery != null && this.prevQuery.equals(query)) {
             return;
         }
-        this.prevQuery = query;
-        this.resultList.children().clear();
         
-        FuzzyFind.search(registryProvider.getItems(), query).forEach(item -> {
-            resultList.children().add(new Result(
+        this.prevQuery = query;
+        this.resultListWidget.children().clear();
+        
+        FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> {
+            resultListWidget.children().add(new ResultWidget(
                     super.textRenderer,
                     item.getString(),
                     item.getScore()
@@ -90,22 +101,45 @@ public class Spotlight extends Screen {
         });
 
         // select first children
-        if (!resultList.children().isEmpty()) {
-            resultList.setSelected(resultList.children().getFirst());
+        if (!resultListWidget.children().isEmpty()) {
+            resultListWidget.setSelected(resultListWidget.children().getFirst());
         } else {
-            resultList.setSelected(null);
+            resultListWidget.setSelected(null);
         }
 
         // reset scroll position
-        resultList.setScrollAmount(0);
+        resultListWidget.setScrollAmount(0);
+    }
+
+    private void check(final BiConsumer<MinecraftClient, ResultWidget> entryConsumer) {
+        final ResultWidget entry = this.resultListWidget.getSelectedOrNull();
+        if (entry == null) {
+            return;
+        }
+        if (super.client == null || super.client.player == null) {
+            return;
+        }
+        entryConsumer.accept(super.client, entry);
+    }
+    
+    public void giveItem() {
+        this.check((client, entry) -> {
+            LogUtil.info("Give " + entry.getItem());
+            //ItemStack itemStack = new ItemStack(entry.getItem());
+            //player.giveItemStack(itemStack);
+        });
     }
 
     public void updateResults() {
-        this.search(this.searchbox.getText());
+        this.search(this.searchboxWidget.getText());
     }
 
+    public ResultListWidget getResultList() {
+        return resultListWidget;
+    }
 
     public void close() {
+        assert super.client != null;
         super.client.setScreen(null);
     }
 }

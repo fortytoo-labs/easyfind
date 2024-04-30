@@ -7,8 +7,8 @@ import net.minecraft.text.Text;
 
 import java.awt.*;
 
-public class ResultList extends AlwaysSelectedEntryListWidget<Result> {
-    public ResultList(MinecraftClient minecraftClient, int width, int height, int y) {
+public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget> {
+    public ResultListWidget(MinecraftClient minecraftClient, int width, int height, int y) {
         super(minecraftClient, width, height, y, 14);
     }
     
@@ -29,7 +29,7 @@ public class ResultList extends AlwaysSelectedEntryListWidget<Result> {
         super.renderWidget(context, mouseX, mouseY, delta);
     }
 
-    public Result at(final int n) {
+    public ResultWidget at(final int n) {
         if (n < 0 || n >= this.children().size()) {
             return null;
         }
