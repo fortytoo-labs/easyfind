@@ -19,11 +19,11 @@ public class RegistryProvider {
         return Collections.unmodifiableCollection(items);
     }
 
-    // TODO: more accurate find
+    // TODO
     private void load() {
         items.clear();
         for (Item item : Registries.ITEM) {
-            items.add(item.toString());
+            items.add(item.getTranslationKey());
         }
     }
 }
