@@ -95,7 +95,7 @@ public class Spotlight extends Screen {
         FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> {
             resultListWidget.children().add(new ResultWidget(
                     super.textRenderer,
-                    item.getString(),
+                    item.getReferent().getTranslationKey(),
                     item.getScore()
             ));
         });

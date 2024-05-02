@@ -10,17 +10,17 @@ import java.util.List;
 
 public class RegistryProvider {
 
-    private static final Collection<String> ITEMS;
+    private static final Collection<Item> ITEMS;
 
     static {
-        List<String> items = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
         for (Item item : Registries.ITEM) {
-            items.add(item.getTranslationKey());
+            items.add(item);
         }
         ITEMS = Collections.unmodifiableCollection(items);
     }
 
-    public static Collection<String> getItems() {
+    public static Collection<Item> getItems() {
         return ITEMS;
     }
 }
