@@ -6,12 +6,10 @@ import net.fortytoo.easyfind.easyfind.screens.widgets.ResultListWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.SearchboxWidget;
 import net.fortytoo.easyfind.easyfind.utils.FuzzyFind;
-import net.fortytoo.easyfind.easyfind.utils.LogUtil;
 import net.fortytoo.easyfind.easyfind.utils.RegistryProvider;
 import net.fortytoo.easyfind.easyfind.utils.SearchResult;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.Objects;
@@ -22,8 +20,6 @@ public class Spotlight extends Screen {
     private SearchboxWidget searchboxWidget;
     private ResultListWidget resultListWidget;
 
-    private ServerPlayerEntity player;
-    
     private final int inputHeight = 16;
     private String prevQuery;
     
@@ -95,7 +91,7 @@ public class Spotlight extends Screen {
         FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> {
             resultListWidget.children().add(new ResultWidget(
                     super.textRenderer,
-                    item.getReferent().getTranslationKey(),
+                    item.getReferent(),
                     item.getScore()
             ));
         });
@@ -124,9 +120,8 @@ public class Spotlight extends Screen {
     
     public void giveItem() {
         this.check((client, entry) -> {
-            LogUtil.info("Give " + entry.getItem());
-            //ItemStack itemStack = new ItemStack(entry.getItem());
-            //player.giveItemStack(itemStack);
+            assert client.player != null;
+            client.player.networkHandler.sendCommand("give @p " + entry.getItem());
         });
     }
 
