@@ -8,15 +8,12 @@ import java.util.Collection;
 
 public class FuzzyFind {
     public static Collection<BoundExtractedResult<Item>> search(Collection<Item> itemList, final String query) {
-        Collection<BoundExtractedResult<Item>> result = FuzzySearch.extractTop(
+        return FuzzySearch.extractTop(
                 query,
                 itemList,
                 Item::toString,
                 20,
                 50
         );
-        
-        // Must be returning filtered Collection<Item>
-        return result;
     }
 }
