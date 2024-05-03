@@ -41,7 +41,7 @@ public class Spotlight extends Screen {
         final int resultBoxHeight = Math.min(super.height / 2, 300);
 
         final int searchFieldX = super.width / 2 - resultBoxWidth / 2;
-        final int searchFieldY = super.height / 6;
+        final int searchFieldY = (super.height / 6) - 4;
         
         final int resultBoxX = super.width / 2 - resultBoxWidth / 2;
         final int resultBoxY = super.height / 6 + inputHeight + 1;
@@ -52,9 +52,7 @@ public class Spotlight extends Screen {
                 searchFieldX,
                 searchFieldY,
                 resultBoxWidth,
-                inputHeight,
-                Text.translatable("efs.title"),
-                Text.translatable("efs.placeholder")
+                inputHeight
         );
         
         this.searchboxWidget.setChangedListener(this::search);
@@ -69,12 +67,13 @@ public class Spotlight extends Screen {
         
         // Item Lists
         resultListWidget = new ResultListWidget(
+                this,
                 super.client,
-                resultBoxWidth,
+                super.width,
                 resultBoxHeight,
                 resultBoxY
         );
-        resultListWidget.setX(resultBoxX);
+
         super.addDrawableChild(resultListWidget);
         
         this.updateResults();
@@ -118,10 +117,13 @@ public class Spotlight extends Screen {
         entryConsumer.accept(super.client, entry);
     }
     
+    // TODO: Add into player ItemStack
+    // This is a temporary solution while I'm looking into it.
     public void giveItem() {
         this.check((client, entry) -> {
             assert client.player != null;
             client.player.networkHandler.sendCommand("give @p " + entry.getItem());
+            this.close();
         });
     }
 
