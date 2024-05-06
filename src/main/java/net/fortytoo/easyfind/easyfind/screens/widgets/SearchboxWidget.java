@@ -15,7 +15,7 @@ public class SearchboxWidget extends TextFieldWidget {
     private BiConsumer<SearchResult, ResultWidget> resultConsumer = null;
     
     public SearchboxWidget(Spotlight screen, TextRenderer textRenderer, int x, int y, int width, int height) {
-        super(textRenderer, x, y, width, height, Text.translatable("efs.placeholder"));
+        super(textRenderer, x, y - 4, width, height + 4, Text.translatable("efs.placeholder"));
         this.spotlight = screen;
     }
     
