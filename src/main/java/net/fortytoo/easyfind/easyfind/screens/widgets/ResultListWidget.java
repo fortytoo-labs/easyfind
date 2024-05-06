@@ -41,7 +41,6 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
                     Color.PINK.getRGB(),
                     true
             );
-            return;
         }
         super.renderWidget(context, mouseX, mouseY, delta);
     }
