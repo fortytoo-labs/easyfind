@@ -33,10 +33,10 @@ public class ResultWidget extends AlwaysSelectedEntryListWidget.Entry<ResultWidg
 
     @Override
     public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        final Text strgen = Text.translatable(this.item.getTranslationKey());
+        final Text text = Text.translatable(this.item.getTranslationKey());
         final ItemStack itemStack = new ItemStack(this.item);
         
         context.drawItem(itemStack, x, y);
-        context.drawText(this.textRenderer, strgen, x + 20, y + 4, Color.WHITE.getRGB(), false);
+        context.drawText(this.textRenderer, text, x + 20, y + 4, Color.WHITE.getRGB(), false);
     }
 }
