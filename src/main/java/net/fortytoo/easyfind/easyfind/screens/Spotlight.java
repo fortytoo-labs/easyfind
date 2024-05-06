@@ -20,8 +20,9 @@ public class Spotlight extends Screen {
     private SearchboxWidget searchboxWidget;
     private ResultListWidget resultListWidget;
 
-    private final int inputHeight = 16;
     private String prevQuery;
+    
+    final int inputHeight = 16;
     
     public Spotlight() {
         super(Text.translatable("efs.title"));
@@ -88,13 +89,13 @@ public class Spotlight extends Screen {
         this.prevQuery = query;
         this.resultListWidget.children().clear();
         
-        FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> {
-            resultListWidget.children().add(new ResultWidget(
-                    super.textRenderer,
-                    item.getReferent(),
-                    item.getScore()
-            ));
-        });
+        FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> 
+                resultListWidget.children().add(
+                        new ResultWidget(
+                                super.textRenderer,
+                                item.getReferent(),
+                                item.getScore()
+        )));
 
         // select first children
         if (!resultListWidget.children().isEmpty()) {
