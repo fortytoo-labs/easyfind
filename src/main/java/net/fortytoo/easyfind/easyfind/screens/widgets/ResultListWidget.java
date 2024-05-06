@@ -12,10 +12,12 @@ import java.awt.*;
 
 public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget> {
     private Spotlight spotlight;
+    private int entryWidth;
     
     public ResultListWidget(Spotlight screen, MinecraftClient minecraftClient, int width, int height, int y) {
-        super(minecraftClient, width, height, y, 14);
+        super(minecraftClient, width, height, y, 20);
         this.spotlight = screen;
+        this.entryWidth = width;
     }
 
     public void selectNextEntryInDirection(final NavigationDirection direction) {
@@ -23,6 +25,20 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         if (entry != null) {
             this.setSelected(entry);
         }
+    }
+    
+    // TODO: Style the entry list
+    @Override
+    public int getRowWidth() {
+        return this.entryWidth - 24;
+    }
+
+    @Override
+    protected void drawHeaderAndFooterSeparators(DrawContext context) {}
+
+    @Override
+    protected void drawMenuListBackground(DrawContext context) {
+        super.drawMenuListBackground(context);
     }
     
     @Override

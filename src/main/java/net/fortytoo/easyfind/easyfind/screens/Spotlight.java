@@ -69,11 +69,12 @@ public class Spotlight extends Screen {
         resultListWidget = new ResultListWidget(
                 this,
                 super.client,
-                super.width,
+                resultBoxWidth,
                 resultBoxHeight,
                 resultBoxY
         );
 
+        resultListWidget.setX(resultBoxX);
         super.addDrawableChild(resultListWidget);
         
         this.updateResults();
