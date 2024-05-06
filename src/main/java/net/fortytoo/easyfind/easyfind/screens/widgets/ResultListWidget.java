@@ -31,7 +31,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     // TODO: Style the entry list
     @Override
     public int getRowWidth() {
-        return this.entryWidth - 24;
+        return this.entryWidth - 34;
     }
 
     @Override
@@ -67,6 +67,20 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     }
     
     @Override
+    protected void renderEntry(DrawContext context, int mouseX, int mouseY, float delta, int index, int x, int y, int entryWidth, int entryHeight) {
+        super.renderEntry(context, mouseX, mouseY, delta, index, x - 14, y, entryWidth, entryHeight);
+    }
+    
+    // Need to be reimplemented for styling purpose.
+    @Override
+    protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
+        int i = this.getX() + (this.width - entryWidth) / 2 - 14;
+        int j = this.getX() + (this.width + entryWidth) / 2 + (this.isScrollbarVisible() ? 8 : 14);
+        context.fill(i, y - 2, j, y + entryHeight + 2, borderColor);
+        context.fill(i + 1, y - 1, j - 1, y + entryHeight + 1, fillColor);
+    }
+    
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -76,6 +90,12 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
             spotlight.giveItem();
             return true;
+        }
+        
+        // TODO: Focus on searchbox when query being entered
+        //       Comparing keyCode to GLFW ascii or something
+        if (false) {
+            spotlight.setFocused(spotlight.getSearchboxWidget());
         }
         
         return super.keyPressed(keyCode, scanCode, modifiers);
