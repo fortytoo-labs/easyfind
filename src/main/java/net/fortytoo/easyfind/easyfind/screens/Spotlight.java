@@ -41,10 +41,10 @@ public class Spotlight extends Screen {
         final int resultBoxHeight = Math.min(super.height / 2, 300);
 
         final int searchFieldX = super.width / 2 - resultBoxWidth / 2;
-        final int searchFieldY = (super.height / 6) - 4;
+        final int searchFieldY = (super.height / 6) + 6;
         
         final int resultBoxX = super.width / 2 - resultBoxWidth / 2;
-        final int resultBoxY = super.height / 6 + inputHeight + 1;
+        final int resultBoxY = (super.height / 6) + inputHeight + 6;
         
         this.searchboxWidget = new SearchboxWidget(
                 this,
@@ -134,6 +134,10 @@ public class Spotlight extends Screen {
 
     public ResultListWidget getResultList() {
         return resultListWidget;
+    }
+    
+    public SearchboxWidget getSearchboxWidget() {
+        return searchboxWidget;
     }
 
     public void close() {

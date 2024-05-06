@@ -37,6 +37,6 @@ public class ResultWidget extends AlwaysSelectedEntryListWidget.Entry<ResultWidg
         final ItemStack itemStack = new ItemStack(this.item);
         
         context.drawItem(itemStack, x, y);
-        context.drawText(this.textRenderer, strgen, x + 20, y + 3, Color.WHITE.getRGB(), false);
+        context.drawText(this.textRenderer, strgen, x + 20, y + 4, Color.WHITE.getRGB(), false);
     }
 }
