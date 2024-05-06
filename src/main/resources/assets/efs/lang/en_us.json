@@ -3,11 +3,7 @@
   "efs.spotlight": "Open Search",
   "efs.title": "EasyFind item search",
   "efs.placeholder": "Search...",
-  
-  "efs.confirm": "",
-  "efs.up": "",
-  "efs.down": "",
+  "efs.attract": "No Recent Pick",
   "efs.404": "Not Found",
-  
   "efs.settei": "Settings"
 }

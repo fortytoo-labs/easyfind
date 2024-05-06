@@ -1,5 +1,6 @@
 package net.fortytoo.easyfind.easyfind.screens.widgets;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fortytoo.easyfind.easyfind.screens.Spotlight;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -11,8 +12,8 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget> {
-    private Spotlight spotlight;
-    private int entryWidth;
+    final private Spotlight spotlight;
+    final private int entryWidth;
     
     public ResultListWidget(Spotlight screen, MinecraftClient minecraftClient, int width, int height, int y) {
         super(minecraftClient, width, height, y, 20);
@@ -34,7 +35,14 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     }
 
     @Override
-    protected void drawHeaderAndFooterSeparators(DrawContext context) {}
+    protected void drawHeaderAndFooterSeparators(DrawContext context) {
+        RenderSystem.enableBlend();
+        context.drawBorder(this.getX(), this.getY() - 1, this.getWidth(), 1, Color.WHITE.getRGB()); // top
+        context.drawBorder(this.getX(), this.getBottom(), this.getWidth(), 1, Color.WHITE.getRGB()); // bottom
+        context.drawBorder(this.getX(), this.getY(), 1, this.getHeight() + 1, Color.WHITE.getRGB()); // left
+        context.drawBorder(this.getRight() - 1, this.getY() - 1, 1, this.getHeight() + 2, Color.WHITE.getRGB()); // right
+        RenderSystem.disableBlend();
+    }
 
     @Override
     protected void drawMenuListBackground(DrawContext context) {
@@ -43,10 +51,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     
     @Override
     public void renderWidget(final DrawContext context, final int mouseX, final int mouseY, final float delta) {
-        /* TODO:
-            Make this render directly as a ResultWidget with red text
-            or centered text, idk. Might decide later.
-         */
+        if (spotlight.getSearchboxWidget().getText().isEmpty()) return;
         if (this.children().isEmpty()) {
             final Text text = Text.translatable("efs.404");
             context.drawText(
@@ -74,13 +79,6 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         }
         
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    public ResultWidget at(final int n) {
-        if (n < 0 || n >= this.children().size()) {
-            return null;
-        }
-        return this.children().get(n);
     }
     
     @Override
