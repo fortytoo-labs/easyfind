@@ -3,6 +3,7 @@ package net.fortytoo.easyfind.easyfind.screens.widgets;
 import net.fortytoo.easyfind.easyfind.screens.Spotlight;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
@@ -16,9 +17,20 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         super(minecraftClient, width, height, y, 14);
         this.spotlight = screen;
     }
+
+    public void selectNextEntryInDirection(final NavigationDirection direction) {
+        final ResultWidget entry = this.getNeighboringEntry(direction);
+        if (entry != null) {
+            this.setSelected(entry);
+        }
+    }
     
     @Override
     public void renderWidget(final DrawContext context, final int mouseX, final int mouseY, final float delta) {
+        /* TODO:
+            Make this render directly as a ResultWidget with red text
+            or centered text, idk. Might decide later.
+         */
         if (this.children().isEmpty()) {
             final Text text = Text.translatable("efs.404");
             context.drawText(
