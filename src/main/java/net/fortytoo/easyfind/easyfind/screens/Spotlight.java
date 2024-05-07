@@ -15,6 +15,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -145,7 +146,9 @@ public class Spotlight extends Screen {
         this.check((client, entry) -> {
             assert client.player != null;
             final Item item = entry.getItem();
+            final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
             ClientPlayNetworking.send(new GiveItemPayload(new ItemStack(item)));
+            client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
             this.itemHistory.push(item);
             this.close();
         });

@@ -17,4 +17,3 @@ public class EasyFind implements ModInitializer {
         LogUtil.info("Welcome to EasyFind!");
     }
 }
-
