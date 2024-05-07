@@ -2,6 +2,8 @@ package net.fortytoo.easyfind.easyfind.screens;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fortytoo.easyfind.easyfind.payloads.GiveItemPayload;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultListWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.SearchboxWidget;
@@ -12,7 +14,9 @@ import net.fortytoo.easyfind.easyfind.utils.SearchResult;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.Objects;
 import java.util.Queue;
@@ -22,6 +26,8 @@ import java.util.function.BiConsumer;
 public class Spotlight extends Screen {
     private SearchboxWidget searchboxWidget;
     private ResultListWidget resultListWidget;
+    
+    public static final Identifier EFSGI_PAKID = new Identifier("efs", "give_item");
 
     private final ItemHistory itemHistory;
 
@@ -135,16 +141,12 @@ public class Spotlight extends Screen {
         entryConsumer.accept(super.client, entry);
     }
     
-    // TODO: Add into player ItemStack
-    // This is a temporary solution while I'm looking into it.
     public void giveItem() {
         this.check((client, entry) -> {
             assert client.player != null;
             final Item item = entry.getItem();
-            final boolean status = client.player.networkHandler.sendCommand("give @p " + item);
-            if (status) {
-                this.itemHistory.push(item);
-            }
+            ClientPlayNetworking.send(new GiveItemPayload(new ItemStack(item)));
+            this.itemHistory.push(item);
             this.close();
         });
     }
