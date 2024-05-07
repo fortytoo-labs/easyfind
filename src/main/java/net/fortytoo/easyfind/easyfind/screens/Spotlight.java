@@ -6,13 +6,16 @@ import net.fortytoo.easyfind.easyfind.screens.widgets.ResultListWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.SearchboxWidget;
 import net.fortytoo.easyfind.easyfind.utils.FuzzyFind;
+import net.fortytoo.easyfind.easyfind.utils.ItemHistory;
 import net.fortytoo.easyfind.easyfind.utils.RegistryProvider;
 import net.fortytoo.easyfind.easyfind.utils.SearchResult;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 
 import java.util.Objects;
+import java.util.Queue;
 import java.util.function.BiConsumer;
 
 @Environment(EnvType.CLIENT)
@@ -20,12 +23,15 @@ public class Spotlight extends Screen {
     private SearchboxWidget searchboxWidget;
     private ResultListWidget resultListWidget;
 
+    private final ItemHistory itemHistory;
+
     private String prevQuery;
     
     final int inputHeight = 16;
     
-    public Spotlight() {
+    public Spotlight(ItemHistory itemHistory) {
         super(Text.translatable("efs.title"));
+        this.itemHistory = itemHistory;
     }
     
     @Override
@@ -89,13 +95,23 @@ public class Spotlight extends Screen {
         this.prevQuery = query;
         this.resultListWidget.children().clear();
         
-        FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> 
-                resultListWidget.children().add(
-                        new ResultWidget(
-                                super.textRenderer,
-                                item.getReferent(),
-                                item.getScore()
-        )));
+        if (query.isEmpty()) {
+            this.itemHistory.getItemHistory().forEach(item -> resultListWidget.children().add(
+                    new ResultWidget(
+                            super.textRenderer,
+                            item,
+                            0)));
+        }
+        else {
+            FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> 
+                    resultListWidget.children().add(
+                            new ResultWidget(
+                                    super.textRenderer,
+                                    item.getReferent(),
+                                    item.getScore()
+            )));
+        }
+        
 
         // select first children
         if (!resultListWidget.children().isEmpty()) {
@@ -124,7 +140,11 @@ public class Spotlight extends Screen {
     public void giveItem() {
         this.check((client, entry) -> {
             assert client.player != null;
-            client.player.networkHandler.sendCommand("give @p " + entry.getItem());
+            final Item item = entry.getItem();
+            final boolean status = client.player.networkHandler.sendCommand("give @p " + item);
+            if (status) {
+                this.itemHistory.push(item);
+            }
             this.close();
         });
     }
@@ -139,6 +159,10 @@ public class Spotlight extends Screen {
     
     public SearchboxWidget getSearchboxWidget() {
         return searchboxWidget;
+    }
+
+    public Queue<Item> getItemHistory() {
+        return itemHistory.getItemHistory();
     }
 
     public void close() {

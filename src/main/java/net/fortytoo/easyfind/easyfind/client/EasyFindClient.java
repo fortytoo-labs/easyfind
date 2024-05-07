@@ -4,12 +4,14 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fortytoo.easyfind.easyfind.screens.Spotlight;
+import net.fortytoo.easyfind.easyfind.utils.ItemHistory;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
 public class EasyFindClient implements ClientModInitializer {
     private static KeyBinding openEFS;
+    private final ItemHistory itemHistory = new ItemHistory(20);
     
     @Override
     public void onInitializeClient() {
@@ -23,7 +25,7 @@ public class EasyFindClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openEFS.wasPressed()) {
                 if (client.player != null && client.player.getAbilities().creativeMode) {
-                    client.setScreen(new Spotlight());
+                    client.setScreen(new Spotlight(itemHistory));
                 }
             }
         });

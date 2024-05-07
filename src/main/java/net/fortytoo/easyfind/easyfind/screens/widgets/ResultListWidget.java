@@ -51,7 +51,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     
     @Override
     public void renderWidget(final DrawContext context, final int mouseX, final int mouseY, final float delta) {
-        if (spotlight.getSearchboxWidget().getText().isEmpty()) return;
+        if (spotlight.getSearchboxWidget().getText().isEmpty() && spotlight.getItemHistory().isEmpty()) return;
         if (this.children().isEmpty()) {
             final Text text = Text.translatable("efs.404");
             context.drawText(
