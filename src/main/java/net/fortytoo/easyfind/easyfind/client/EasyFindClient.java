@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class EasyFindClient implements ClientModInitializer {
     private static KeyBinding openEFS;
-    private final ItemHistory itemHistory = new ItemHistory(20);
+    private final ItemHistory itemHistory = new ItemHistory(24);
     
     @Override
     public void onInitializeClient() {

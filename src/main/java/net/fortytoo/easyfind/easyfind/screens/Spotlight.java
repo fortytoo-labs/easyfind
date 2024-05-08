@@ -158,7 +158,25 @@ public class Spotlight extends Screen {
         entryConsumer.accept(super.client, entry);
     }
 
-    private boolean doubleClick(final double mouseY, final int button) {
+    private void selectEntry(final ResultWidget entry) {
+        this.resultListWidget.setSelected(entry);
+        if (!entry.getItem().equals(this.lastClickItemEntry)) {
+            this.lastClickItemEntry = null;
+        }
+    }
+
+    private boolean entryClickHandler(final double mouseY, final int button) {
+        // entry select
+        final int entryY = this.resultListWidget.getEntryY(mouseY);
+        if (entryY >= 0) {
+            final int entryIndex = entryY / this.resultListWidget.getEntryHeight();
+            final ResultWidget entry = this.resultListWidget.at(entryIndex);
+            if (entry != null) {
+                this.selectEntry(entry);
+            }
+        }
+        
+        // double click exec
         final ResultWidget selectedEntry = this.resultListWidget.getSelectedOrNull();
         if (selectedEntry != null) {
             final long timeMs = Util.getMeasuringTimeMs();
@@ -180,7 +198,7 @@ public class Spotlight extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.resultListWidget.isMouseOver(mouseX, mouseY)
-                && this.doubleClick(mouseY, button)) {
+                && this.entryClickHandler(mouseY, button)) {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

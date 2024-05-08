@@ -90,6 +90,17 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
                 - this.headerHeight + (int) this.getScrollAmount() - 2;
     }
 
+    public int getEntryHeight() {
+        return this.itemHeight;
+    }
+
+    public ResultWidget at(final int n) {
+        if (n < 0 || n >= this.children().size()) {
+            return null;
+        }
+        return this.children().get(n);
+    }
+
     public boolean isMouseOver(final double mouseX, final double mouseY) {
         return mouseX >= this.getX()
                 && mouseX <= this.getX() + this.width
