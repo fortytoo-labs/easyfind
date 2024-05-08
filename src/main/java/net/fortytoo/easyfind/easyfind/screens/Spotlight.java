@@ -166,6 +166,8 @@ public class Spotlight extends Screen {
                     final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
                     
                     int slot;
+
+                    this.itemHistory.push(item);
                     
                     // Check if player already has the item in the hotbar, if so, select them
                     for (slot = 0; slot <= 8; slot++) {
@@ -185,7 +187,6 @@ public class Spotlight extends Screen {
                     inventory.selectedSlot = slot;
                     
                     client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
-                    this.itemHistory.push(item);
                     this.close();
                 }
             }
