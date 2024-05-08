@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 import java.util.Objects;
 import java.util.Queue;
@@ -31,6 +32,9 @@ public class Spotlight extends Screen {
     private final ItemHistory itemHistory;
 
     private String prevQuery;
+    private Item lastClickItemEntry;
+    
+    private long lastClickTime;
     
     final int inputHeight = 16;
     
@@ -153,6 +157,34 @@ public class Spotlight extends Screen {
         }
         entryConsumer.accept(super.client, entry);
     }
+
+    private boolean doubleClick(final double mouseY, final int button) {
+        final ResultWidget selectedEntry = this.resultListWidget.getSelectedOrNull();
+        if (selectedEntry != null) {
+            final long timeMs = Util.getMeasuringTimeMs();
+            if (timeMs - this.lastClickTime <= 420
+                    && this.lastClickItemEntry != null
+                    && this.lastClickItemEntry.equals(selectedEntry.getItem())) {
+                if (button == 0) {
+                    this.giveItem();
+                }
+                return true;
+            }
+
+            this.lastClickTime = timeMs;
+            this.lastClickItemEntry = selectedEntry.getItem();
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.resultListWidget.isMouseOver(mouseX, mouseY)
+                && this.doubleClick(mouseY, button)) {
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
     
     // TODO: Configurable, also refactor this.
     public void giveItem() {
@@ -178,7 +210,7 @@ public class Spotlight extends Screen {
                         }
                     }
                     
-                    // Add to stack if there is a empty slot, replace selected if isn't
+                    // Add to stack if there is an empty slot, replace selected if isn't
                     final int emptySlot = inventory.getEmptySlot();
                     if (emptySlot == -1 || emptySlot > 8) slot = inventory.selectedSlot;
                     else slot = emptySlot;

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -28,7 +29,6 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         }
     }
     
-    // TODO: Style the entry list
     @Override
     public int getRowWidth() {
         return this.entryWidth - 34;
@@ -71,7 +71,6 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         super.renderEntry(context, mouseX, mouseY, delta, index, x - 14, y, entryWidth, entryHeight);
     }
     
-    // Need to be reimplemented for styling purpose.
     @Override
     protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
         int i = this.getX() + (this.width - entryWidth) / 2 - 14;
@@ -85,6 +84,19 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    // mouse click helper
+    public int getEntryY(final double mouseY) {
+        return MathHelper.floor(mouseY - this.getY())
+                - this.headerHeight + (int) this.getScrollAmount() - 2;
+    }
+
+    public boolean isMouseOver(final double mouseX, final double mouseY) {
+        return mouseX >= this.getX()
+                && mouseX <= this.getX() + this.width
+                && mouseY >= this.getY()
+                && mouseY <= this.getY() + this.height;
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
@@ -94,7 +106,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         
         // TODO: Focus on searchbox when query being entered
         //       Comparing keyCode to GLFW ascii or something
-        if (false) {
+        if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             spotlight.setFocused(spotlight.getSearchboxWidget());
         }
         
