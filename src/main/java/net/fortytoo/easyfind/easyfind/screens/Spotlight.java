@@ -12,6 +12,7 @@ import net.fortytoo.easyfind.easyfind.utils.SearchResult;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
@@ -153,17 +154,35 @@ public class Spotlight extends Screen {
         entryConsumer.accept(super.client, entry);
     }
     
+    // TODO: Configurable, also refactor this.
     public void giveItem() {
         this.check((client, entry) -> {
             assert client.player != null;
             if (client.player.getAbilities().creativeMode) {
                 final Item item = entry.getItem();
                 if (client.player.networkHandler.hasFeature(item.getRequiredFeatures())) {
+                    final PlayerInventory inventory = client.player.getInventory();
                     final ItemStack itemStack = new ItemStack(item);
                     final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
                     
-                    final int slot = client.player.getInventory().selectedSlot + 36;
-                    client.player.networkHandler.sendPacket(new CreativeInventoryActionC2SPacket(slot, itemStack));
+                    int slot;
+                    
+                    // Check if player already has the item in the hotbar, if so, select them
+                    for (slot = 0; slot <= 8; slot++) {
+                        if (inventory.main.get(slot).isOf(item)) {
+                            inventory.selectedSlot = slot;
+                            this.close();
+                            return;
+                        }
+                    }
+                    
+                    // Add to stack if there is a empty slot, replace selected if isn't
+                    final int emptySlot = inventory.getEmptySlot();
+                    if (emptySlot == -1 || emptySlot > 8) slot = inventory.selectedSlot;
+                    else slot = emptySlot;
+                    
+                    client.player.networkHandler.sendPacket(new CreativeInventoryActionC2SPacket(slot + 36, itemStack));
+                    inventory.selectedSlot = slot;
                     
                     client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
                     this.itemHistory.push(item);
