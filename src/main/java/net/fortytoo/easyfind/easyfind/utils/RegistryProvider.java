@@ -9,11 +9,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class RegistryProvider {
-
     private static final Collection<Item> ITEMS;
-
-    // TODO: Hide item that is a part of experimental features.
-    //  See FeatureSet -> ToggleableFeature
+    
     static {
         List<Item> items = new ArrayList<>();
         for (Item item : Registries.ITEM) {

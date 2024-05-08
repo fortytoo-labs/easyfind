@@ -11,6 +11,7 @@ import net.fortytoo.easyfind.easyfind.utils.RegistryProvider;
 import net.fortytoo.easyfind.easyfind.utils.SearchResult;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
@@ -32,6 +33,8 @@ public class Spotlight extends Screen {
     
     final int inputHeight = 16;
     
+    ClientPlayerEntity player;
+
     public Spotlight(ItemHistory itemHistory) {
         super(Text.translatable("efs.title"));
         this.itemHistory = itemHistory;
@@ -45,6 +48,10 @@ public class Spotlight extends Screen {
     @Override
     protected void init() {
         super.init();
+
+        if (client != null) {
+            player = client.player;
+        }
 
         // TODO: change these
         final int resultBoxWidth = Math.min(super.width / 2, 300);
@@ -111,7 +118,9 @@ public class Spotlight extends Screen {
                     new ResultWidget(
                             super.textRenderer,
                             item,
-                            0)));
+                            0,
+                            player
+                    )));
         }
         else {
             FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> 
@@ -119,19 +128,17 @@ public class Spotlight extends Screen {
                             new ResultWidget(
                                     super.textRenderer,
                                     item.getReferent(),
-                                    item.getScore()
+                                    item.getScore(),
+                                    player
             )));
         }
         
-
-        // select first children
         if (!resultListWidget.children().isEmpty()) {
             resultListWidget.setSelected(resultListWidget.children().getFirst());
         } else {
             resultListWidget.setSelected(null);
         }
-
-        // reset scroll position
+        
         resultListWidget.setScrollAmount(0);
     }
 
@@ -160,9 +167,9 @@ public class Spotlight extends Screen {
                     
                     client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
                     this.itemHistory.push(item);
+                    this.close();
                 }
             }
-            this.close();
         });
     }
 
