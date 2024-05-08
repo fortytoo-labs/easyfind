@@ -2,8 +2,6 @@ package net.fortytoo.easyfind.easyfind.screens;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fortytoo.easyfind.easyfind.payloads.GiveItemPayload;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultListWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.SearchboxWidget;
@@ -15,9 +13,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.util.Objects;
 import java.util.Queue;
@@ -27,8 +25,6 @@ import java.util.function.BiConsumer;
 public class Spotlight extends Screen {
     private SearchboxWidget searchboxWidget;
     private ResultListWidget resultListWidget;
-    
-    public static final Identifier EFSGI_PAKID = new Identifier("efs", "give_item");
 
     private final ItemHistory itemHistory;
 
@@ -153,11 +149,19 @@ public class Spotlight extends Screen {
     public void giveItem() {
         this.check((client, entry) -> {
             assert client.player != null;
-            final Item item = entry.getItem();
-            final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
-            ClientPlayNetworking.send(new GiveItemPayload(new ItemStack(item)));
-            client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
-            this.itemHistory.push(item);
+            if (client.player.getAbilities().creativeMode) {
+                final Item item = entry.getItem();
+                if (client.player.networkHandler.hasFeature(item.getRequiredFeatures())) {
+                    final ItemStack itemStack = new ItemStack(item);
+                    final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
+                    
+                    final int slot = client.player.getInventory().selectedSlot + 36;
+                    client.player.networkHandler.sendPacket(new CreativeInventoryActionC2SPacket(slot, itemStack));
+                    
+                    client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
+                    this.itemHistory.push(item);
+                }
+            }
             this.close();
         });
     }
