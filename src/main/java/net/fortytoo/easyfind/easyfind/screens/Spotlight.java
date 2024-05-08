@@ -94,6 +94,14 @@ public class Spotlight extends Screen {
         this.updateResults();
     }
     
+    @Override
+    public void tick() {
+        if (client != null) {
+            assert client.player != null;
+            if (!client.player.getAbilities().creativeMode) this.close();
+        }
+    }
+    
     private void search(final String query) {
         if (this.prevQuery != null && this.prevQuery.equals(query)) {
             return;
@@ -168,11 +176,6 @@ public class Spotlight extends Screen {
 
     public Queue<Item> getItemHistory() {
         return itemHistory.getItemHistory();
-    }
-
-    public void close() {
-        assert super.client != null;
-        super.client.setScreen(null);
     }
 }
  

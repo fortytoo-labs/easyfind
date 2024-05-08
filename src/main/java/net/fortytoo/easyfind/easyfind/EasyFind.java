@@ -11,7 +11,9 @@ public class EasyFind implements ModInitializer {
     public void onInitialize() {
         PayloadTypeRegistry.playC2S().register(GiveItemPayload.ID, GiveItemPayload.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(GiveItemPayload.ID, (payload, context) -> {
-            context.player().giveItemStack(payload.itemStack());
+            if (context.player().interactionManager.isCreative()) {
+                context.player().giveItemStack(payload.itemStack());
+            }
         });
         
         LogUtil.info("Welcome to EasyFind!");
