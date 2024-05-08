@@ -11,7 +11,7 @@
     "repo": "https://github.com/sorae42/easyfind"
   },
   "license": "MIT",
-  "icon": "assets/easyfind/icon.png",
+  "icon": "assets/efs/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
