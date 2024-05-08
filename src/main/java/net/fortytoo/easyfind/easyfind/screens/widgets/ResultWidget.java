@@ -41,16 +41,26 @@ public class ResultWidget extends AlwaysSelectedEntryListWidget.Entry<ResultWidg
         final boolean isEnabled = player.networkHandler.hasFeature(item.getRequiredFeatures());
         final Rarity rarity = item.getComponents().get(DataComponentTypes.RARITY);
         final Text text;
+        final ItemStack itemStack = new ItemStack(this.item);
+        Text meta = Text.translatable(item.getTranslationKey() + ".desc").formatted(Formatting.GRAY);
         
         if (isEnabled) {
             assert rarity != null;
             text = Text.translatable(item.getTranslationKey()).formatted(rarity.getFormatting());
         }
-        else text = Text.translatable(item.getTranslationKey()).formatted(Formatting.STRIKETHROUGH, Formatting.GRAY);
-                
-        final ItemStack itemStack = new ItemStack(this.item);
+        else {
+            text = Text.translatable(item.getTranslationKey()).formatted(Formatting.STRIKETHROUGH, Formatting.GRAY);
+            meta = Text.translatable("item.disabled").formatted(Formatting.RED);
+        }
         
-        context.drawItem(itemStack, x, y);
-        context.drawText(this.textRenderer, text, x + 20, y + 4, Color.WHITE.getRGB(), false);
+        context.drawItem(itemStack, x + 2, y + 2);
+        
+        // assume .desc means the item doesn't have a description
+        // could be done better.
+        if (!meta.getString().contains(".desc")) {
+            context.drawText(this.textRenderer, text, x + 22, y + 1, Color.WHITE.getRGB(), false);
+            context.drawText(this.textRenderer, meta, x + 22, y + 12, Color.GRAY.getRGB(), false);
+        }
+        else context.drawText(this.textRenderer, text, x + 22, y + 6, Color.WHITE.getRGB(), false);
     }
 }

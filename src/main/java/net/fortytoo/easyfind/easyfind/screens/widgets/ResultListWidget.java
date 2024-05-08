@@ -16,7 +16,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     final private int entryWidth;
     
     public ResultListWidget(Spotlight screen, MinecraftClient minecraftClient, int width, int height, int y) {
-        super(minecraftClient, width, height, y, 20);
+        super(minecraftClient, width, height, y, 24);
         this.spotlight = screen;
         this.entryWidth = width;
     }
