@@ -4,5 +4,10 @@
   "efs.title": "EasyFind item search",
   "efs.placeholder": "Search...",
   "efs.404": "Not Found",
-  "efs.settei": "Settings"
+  "efs.settei": "Settings",
+
+  "easyfind.midnightconfig.showDescription": "Show item description",
+  "easyfind.midnightconfig.coloredRarity": "Colored rarity of item",
+  "easyfind.midnightconfig.showDisabledItem": "Show disabled item",
+  "easyfind.midnightconfig.saveHistory": "Save history of given items"
 }

@@ -3,12 +3,14 @@
   "id": "easyfind",
   "version": "${version}",
   "name": "EasyFind",
-  "description": "Spotlight for the Creative Inventory",
+  "description": "Fuzzy Search for the Creative Inventory",
   "authors": [
     "sorae42"
   ],
   "contact": {
-    "repo": "https://github.com/sorae42/easyfind"
+    "repo": "https://github.com/sorae42/easyfind",
+    "issues": "https://github.com/sorae42/easyfind/issues",
+    "homepage": "https://modrinth.com/mod/easyfind"
   },
   "license": "MIT",
   "icon": "assets/efs/icon.png",

@@ -2,6 +2,7 @@ package net.fortytoo.easyfind.easyfind.screens;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fortytoo.easyfind.easyfind.config.ConfigAgent;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultListWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.SearchboxWidget;
@@ -119,23 +120,32 @@ public class Spotlight extends Screen {
         this.resultListWidget.children().clear();
         
         if (query.isEmpty()) {
-            this.itemHistory.getItemHistory().forEach(item -> resultListWidget.children().add(
+            this.itemHistory.getItemHistory().forEach(item -> {
+                boolean a = this.player.networkHandler.hasFeature(item.getRequiredFeatures());
+                if (!a && !ConfigAgent.showDisabledItem) return;
+                resultListWidget.children().add(
                     new ResultWidget(
                             super.textRenderer,
                             item,
                             0,
-                            player
-                    )));
+                            a
+                    ));
+                }
+            );
         }
         else {
-            FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> 
-                    resultListWidget.children().add(
-                            new ResultWidget(
-                                    super.textRenderer,
-                                    item.getReferent(),
-                                    item.getScore(),
-                                    player
-            )));
+            FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> {
+                boolean a = this.player.networkHandler.hasFeature(item.getReferent().getRequiredFeatures());
+                if (!a && !ConfigAgent.showDisabledItem) return;
+                resultListWidget.children().add(
+                    new ResultWidget(
+                            super.textRenderer,
+                            item.getReferent(),
+                            item.getScore(),
+                            a
+                    ));
+                }
+            );
         }
         
         if (!resultListWidget.children().isEmpty()) {
@@ -217,7 +227,7 @@ public class Spotlight extends Screen {
                     
                     int slot;
 
-                    this.itemHistory.push(item);
+                    if (ConfigAgent.saveHistory) this.itemHistory.push(item);
                     
                     // Check if player already has the item in the hotbar, if so, select them
                     for (slot = 0; slot <= 8; slot++) {
