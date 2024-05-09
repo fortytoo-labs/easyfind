@@ -120,6 +120,7 @@ public class Spotlight extends Screen {
         this.resultListWidget.children().clear();
         
         if (query.isEmpty()) {
+            if (!ConfigAgent.saveHistory) return;
             this.itemHistory.getItemHistory().forEach(item -> {
                 boolean a = this.player.networkHandler.hasFeature(item.getRequiredFeatures());
                 if (!a && !ConfigAgent.showDisabledItem) return;
