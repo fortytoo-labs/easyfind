@@ -6,6 +6,7 @@
   "efs.404": "Not Found",
   "efs.settei": "Settings",
 
+  "easyfind.midnightconfig.title": "EasyFind Configuration",
   "easyfind.midnightconfig.showDescription": "Show item description",
   "easyfind.midnightconfig.coloredRarity": "Colored rarity of item",
   "easyfind.midnightconfig.showDisabledItem": "Show disabled item",
