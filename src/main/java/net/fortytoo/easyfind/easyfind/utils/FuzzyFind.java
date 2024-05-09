@@ -12,7 +12,7 @@ public class FuzzyFind {
                 query,
                 itemList,
                 Item::toString,
-                20,
+                24,
                 50
         );
     }
