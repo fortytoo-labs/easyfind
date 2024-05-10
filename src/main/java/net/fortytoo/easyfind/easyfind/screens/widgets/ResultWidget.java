@@ -16,13 +16,11 @@ import java.awt.*;
 public class ResultWidget extends AlwaysSelectedEntryListWidget.Entry<ResultWidget> {
     private final TextRenderer textRenderer;
     private final Item item;
-    private final int score;
-    private boolean isEnabled;
+    private final boolean isEnabled;
 
-    public ResultWidget(final TextRenderer textRenderer, final Item item, final int score, boolean isEnabled) {
+    public ResultWidget(final TextRenderer textRenderer, final Item item, boolean isEnabled) {
         this.textRenderer = textRenderer;
         this.item = item;
-        this.score = score;
         this.isEnabled = isEnabled;
     }
 

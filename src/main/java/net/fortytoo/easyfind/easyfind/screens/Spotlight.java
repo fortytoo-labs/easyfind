@@ -135,7 +135,6 @@ public class Spotlight extends Screen {
                     new ResultWidget(
                             super.textRenderer,
                             item,
-                            0,
                             a
                     ));
                 }
@@ -149,7 +148,6 @@ public class Spotlight extends Screen {
                     new ResultWidget(
                             super.textRenderer,
                             item.getReferent(),
-                            item.getScore(),
                             a
                     ));
                 }
