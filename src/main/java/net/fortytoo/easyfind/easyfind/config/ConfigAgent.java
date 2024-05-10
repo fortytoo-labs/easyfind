@@ -12,13 +12,10 @@ public class ConfigAgent extends MidnightConfig {
     
     // Behaviour
     @Entry(category = "text") public static ReplaceNeighbor replaceNeighbor = ReplaceNeighbor.CURRENT;
-    @Comment(category = "text") public static Comment replaceNeighborDescription;
     @Entry(category = "text") public static boolean forcedReplace = false;
-    @Comment(category = "text") public static Comment forcedReplaceDescription;
+    @Entry(category = "text")
+    public static boolean ignoreExisting = false;
     
     @Entry(category = "text") public static boolean saveHistory = true;
     @Entry(category = "text") public static boolean showDisabledItem;
-    
-    // TBA
-    public static boolean creativeHotbarAgent;
 }

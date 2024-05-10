@@ -17,8 +17,7 @@
   "easyfind.midnightconfig.enum.ReplaceNeighbor.CURRENT": "Current slot",
   "easyfind.midnightconfig.enum.ReplaceNeighbor.NEXT": "Next slot",
   "easyfind.midnightconfig.enum.ReplaceNeighbor.PREVIOUS": "Previous slot",
-  "easyfind.midnightconfig.replaceNeighborDescription": "Chosen slot will be wrapped over if needed.",
 
   "easyfind.midnightconfig.forcedReplace": "Force replace current slot",
-  "easyfind.midnightconfig.forcedReplaceDescription": "Replace current slot even if you have an empty slot in your hotbar.\nThis option will override option above."
+  "easyfind.midnightconfig.ignoreExisting": "Ignore existing item (duplicate)"
 }

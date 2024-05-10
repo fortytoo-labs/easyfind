@@ -236,11 +236,13 @@ public class Spotlight extends Screen {
                     if (ConfigAgent.saveHistory) this.itemHistory.push(item);
                     
                     // Check if player already has the item in the hotbar, if so, select them
-                    for (slot = 0; slot <= 8; slot++) {
-                        if (inventory.main.get(slot).isOf(item)) {
-                            inventory.selectedSlot = slot;
-                            this.close();
-                            return;
+                    if (!ConfigAgent.ignoreExisting) {
+                        for (slot = 0; slot <= 8; slot++) {
+                            if (inventory.main.get(slot).isOf(item)) {
+                                inventory.selectedSlot = slot;
+                                this.close();
+                                return;
+                            }
                         }
                     }
                     
