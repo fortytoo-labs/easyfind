@@ -11,6 +11,7 @@ import net.fortytoo.easyfind.easyfind.utils.ItemHistory;
 import net.fortytoo.easyfind.easyfind.utils.RegistryProvider;
 import net.fortytoo.easyfind.easyfind.utils.SearchResult;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -101,6 +102,12 @@ public class Spotlight extends Screen {
         super.addDrawableChild(resultListWidget);
         
         this.updateResults();
+    }
+    
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        if (ConfigAgent.blurredBG) this.applyBlur(delta);
+        this.renderDarkening(context);
     }
     
     @Override
@@ -241,7 +248,21 @@ public class Spotlight extends Screen {
                     
                     // Add to stack if there is an empty slot, replace selected if isn't
                     final int emptySlot = inventory.getEmptySlot();
-                    if (emptySlot == -1 || emptySlot > 8) slot = inventory.selectedSlot;
+                    if (ConfigAgent.forcedReplace) slot = inventory.selectedSlot;
+                    else if (emptySlot == -1 || emptySlot > 8) {
+                        slot = inventory.selectedSlot;
+                        slot = switch (ConfigAgent.replaceNeighbor) {
+                            case CURRENT -> slot;
+                            case NEXT -> slot + 1;
+                            case PREVIOUS -> slot - 1;
+                        };
+                        if (ConfigAgent.replaceNeighbor != ConfigAgent.ReplaceNeighbor.CURRENT)
+                            slot = switch (slot) {
+                                case -1 -> 8;
+                                case 9 -> 0;
+                                default -> slot;
+                            };
+                    }
                     else slot = emptySlot;
                     
                     client.player.networkHandler.sendPacket(new CreativeInventoryActionC2SPacket(slot + 36, itemStack));

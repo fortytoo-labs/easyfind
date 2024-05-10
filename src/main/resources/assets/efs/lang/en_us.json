@@ -8,7 +8,17 @@
 
   "easyfind.midnightconfig.title": "EasyFind Configuration",
   "easyfind.midnightconfig.showDescription": "Show item description",
+  "easyfind.midnightconfig.blurredBG": "Blurred Background",
   "easyfind.midnightconfig.coloredRarity": "Colored rarity of item",
   "easyfind.midnightconfig.showDisabledItem": "Show disabled item",
-  "easyfind.midnightconfig.saveHistory": "Save history of given items"
+  "easyfind.midnightconfig.saveHistory": "Save history of given items",
+  
+  "easyfind.midnightconfig.replaceNeighbor": "When hotbar is full, replace on the",
+  "easyfind.midnightconfig.enum.ReplaceNeighbor.CURRENT": "Current slot",
+  "easyfind.midnightconfig.enum.ReplaceNeighbor.NEXT": "Next slot",
+  "easyfind.midnightconfig.enum.ReplaceNeighbor.PREVIOUS": "Previous slot",
+  "easyfind.midnightconfig.replaceNeighborDescription": "Chosen slot will be wrapped over if needed.",
+
+  "easyfind.midnightconfig.forcedReplace": "Force replace current slot",
+  "easyfind.midnightconfig.forcedReplaceDescription": "Replace current slot even if you have an empty slot in your hotbar.\nThis option will override option above."
 }
