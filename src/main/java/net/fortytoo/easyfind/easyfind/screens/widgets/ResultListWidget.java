@@ -115,16 +115,22 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
             spotlight.giveItem();
             return true;
         }
+        
+        ResultListWidget resultList = this.spotlight.getResultList();
+        ResultWidget selected = resultList.getSelectedOrNull();
 
         switch (keyCode) {
             // select previous entry
             case GLFW.GLFW_KEY_UP -> {
-                this.spotlight.getResultList().moveSelection(MoveDirection.UP);
+                if (selected != null && resultList.getEntry(0).equals(selected)) {
+                    this.spotlight.setFocused(this.spotlight.getSearchboxWidget());
+                }
+                resultList.moveSelection(MoveDirection.UP);
                 return true;
             }
             // select next entry
             case GLFW.GLFW_KEY_DOWN -> {
-                this.spotlight.getResultList().moveSelection(MoveDirection.DOWN);
+                resultList.moveSelection(MoveDirection.DOWN);
                 return true;
             }
         }
