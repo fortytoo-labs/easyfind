@@ -1,7 +1,7 @@
 package net.fortytoo.easyfind.easyfind.utils;
 
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
+import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +13,7 @@ public class RegistryProvider {
     
     static {
         List<Item> items = new ArrayList<>();
-        for (Item item : Registries.ITEM) {
+        for (Item item : Registry.ITEM) {
             items.add(item);
         }
         ITEMS = Collections.unmodifiableCollection(items);

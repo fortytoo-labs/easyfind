@@ -1,11 +1,9 @@
 package net.fortytoo.easyfind.easyfind.screens.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fortytoo.easyfind.easyfind.screens.Spotlight;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
@@ -16,17 +14,15 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     final private Spotlight spotlight;
     final private int entryWidth;
     
-    public ResultListWidget(Spotlight screen, MinecraftClient minecraftClient, int width, int height, int y) {
-        super(minecraftClient, width, height, y, 24);
+    public ResultListWidget(Spotlight screen, 
+                            final MinecraftClient minecraftClient,
+                            final int width,
+                            final int height,
+                            final int top,
+                            final int bottom) {
+        super(minecraftClient, width, height, top, bottom, 24);
         this.spotlight = screen;
         this.entryWidth = width;
-    }
-
-    public void selectNextEntryInDirection(final NavigationDirection direction) {
-        final ResultWidget entry = this.getNeighboringEntry(direction);
-        if (entry != null) {
-            this.setSelected(entry);
-        }
     }
     
     @Override
@@ -35,53 +31,49 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     }
 
     @Override
-    protected void drawHeaderAndFooterSeparators(DrawContext context) {
-        RenderSystem.enableBlend();
-        context.drawBorder(this.getX(), this.getY() - 1, this.getWidth(), 1, Color.WHITE.getRGB()); // top
-        context.drawBorder(this.getX(), this.getBottom(), this.getWidth(), 1, Color.WHITE.getRGB()); // bottom
-        context.drawBorder(this.getX(), this.getY(), 1, this.getHeight() + 1, Color.WHITE.getRGB()); // left
-        context.drawBorder(this.getRight() - 1, this.getY() - 1, 1, this.getHeight() + 2, Color.WHITE.getRGB()); // right
-        RenderSystem.disableBlend();
-    }
-
-    @Override
-    protected void drawMenuListBackground(DrawContext context) {
-        super.drawMenuListBackground(context);
+    protected int getScrollbarPositionX() {
+        return this.right - 6;
     }
     
     @Override
-    public void renderWidget(final DrawContext context, final int mouseX, final int mouseY, final float delta) {
+    public void render(final MatrixStack matrices, final int mouseX, final int mouseY, final float delta) {
         // no history found
         if (spotlight.getSearchboxWidget().getText().isEmpty() && spotlight.getItemHistory().isEmpty()) return;
         
         // avoid displaying not found on blank search query
         if (spotlight.getSearchboxWidget().getText().isEmpty() && this.children().isEmpty()) return;
         
+        fill(matrices, this.left - 1, this.top - 1, this.right + 1, this.bottom + 1, Color.WHITE.getRGB()); // border
+        fill(matrices, this.left, this.top, this.right, this.bottom, Color.BLACK.getRGB()); // background
+        
         if (this.children().isEmpty()) {
             final Text text = Text.translatable("efs.404");
-            context.drawText(
-                    this.client.textRenderer,
+            this.client.textRenderer.draw(
+                    matrices,
                     text,
-                    this.getX() + this.width / 2 - this.client.textRenderer.getWidth(text) / 2,
-                    this.getY() + this.height / 2 - 5,
-                    Color.PINK.getRGB(),
-                    true
+                    this.left + this.width / 2 - this.client.textRenderer.getWidth(text) / 2,
+                    this.top + this.height / 2 - 5,
+                    Color.PINK.getRGB()
             );
         }
-        super.renderWidget(context, mouseX, mouseY, delta);
+        
+        // manual scissor
+        enableScissor(this.left, this.top, this.right, this.bottom);
+        super.render(matrices, mouseX, mouseY, delta);
+        disableScissor();
     }
     
     @Override
-    protected void renderEntry(DrawContext context, int mouseX, int mouseY, float delta, int index, int x, int y, int entryWidth, int entryHeight) {
-        super.renderEntry(context, mouseX, mouseY, delta, index, x - 14, y, entryWidth, entryHeight);
+    protected void renderEntry(MatrixStack matrices, int mouseX, int mouseY, float delta, int index, int x, int y, int entryWidth, int entryHeight) {
+        super.renderEntry(matrices, mouseX, mouseY, delta, index, x - 14, y, entryWidth, entryHeight);
     }
     
     @Override
-    protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
-        int i = this.getX() + (this.width - entryWidth) / 2 - 14;
-        int j = this.getX() + (this.width + entryWidth) / 2 + (this.isScrollbarVisible() ? 8 : 14);
-        context.fill(i, y - 2, j, y + entryHeight + 2, borderColor);
-        context.fill(i + 1, y - 1, j - 1, y + entryHeight + 1, fillColor);
+    protected void drawSelectionHighlight(MatrixStack matrices, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
+        int i = this.left + (this.width - entryWidth) / 2 - 14;
+        int j = this.left + (this.width + entryWidth) / 2 + ((this.getMaxScroll() > 0) ? 8 : 14);
+        fill(matrices, i, y - 2, j, y + entryHeight + 2, borderColor);
+        fill(matrices,i + 1, y - 1, j - 1, y + entryHeight + 1, fillColor);
     }
     
     @Override
@@ -91,7 +83,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
 
     // mouse click helper
     public int getEntryY(final double mouseY) {
-        return MathHelper.floor(mouseY - this.getY())
+        return MathHelper.floor(mouseY - this.top)
                 - this.headerHeight + (int) this.getScrollAmount() - 2;
     }
 
@@ -107,10 +99,14 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     }
 
     public boolean isMouseOver(final double mouseX, final double mouseY) {
-        return mouseX >= this.getX()
-                && mouseX <= this.getX() + this.width
-                && mouseY >= this.getY()
-                && mouseY <= this.getY() + this.height;
+        return mouseX >= (double) this.left
+                && mouseX <= (double) this.right
+                && mouseY >= (double) this.top
+                && mouseY <= (double) this.bottom;
+    }
+    
+    public void skipSelection() {
+        this.spotlight.getResultList().moveSelection(MoveDirection.DOWN);
     }
 
     @Override
@@ -118,6 +114,19 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
             spotlight.giveItem();
             return true;
+        }
+
+        switch (keyCode) {
+            // select previous entry
+            case GLFW.GLFW_KEY_UP -> {
+                this.spotlight.getResultList().moveSelection(MoveDirection.UP);
+                return true;
+            }
+            // select next entry
+            case GLFW.GLFW_KEY_DOWN -> {
+                this.spotlight.getResultList().moveSelection(MoveDirection.DOWN);
+                return true;
+            }
         }
         
         // TODO: Focus on searchbox when query being entered
@@ -127,10 +136,5 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
         }
         
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-    
-    @Override
-    public void setFocused(boolean focused) {
-        super.setFocused(false);
     }
 }

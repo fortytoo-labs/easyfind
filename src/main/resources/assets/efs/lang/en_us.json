@@ -7,10 +7,9 @@
   "efs.settei": "Settings",
 
   "easyfind.midnightconfig.title": "EasyFind Configuration",
+  "easyfind.midnightconfig.darkBG": "Darken Background",
   "easyfind.midnightconfig.showDescription": "Show item description",
-  "easyfind.midnightconfig.blurredBG": "Blurred Background",
   "easyfind.midnightconfig.coloredRarity": "Colored rarity of item",
-  "easyfind.midnightconfig.showDisabledItem": "Show disabled item",
   "easyfind.midnightconfig.saveHistory": "Save history of given items",
   
   "easyfind.midnightconfig.replaceNeighbor": "When hotbar is full, replace on the",
