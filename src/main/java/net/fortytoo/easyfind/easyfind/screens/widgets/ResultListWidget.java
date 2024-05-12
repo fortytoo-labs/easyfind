@@ -37,10 +37,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     @Override
     protected void drawHeaderAndFooterSeparators(DrawContext context) {
         RenderSystem.enableBlend();
-        context.drawBorder(this.getX(), this.getY() - 1, this.getWidth(), 1, Color.WHITE.getRGB()); // top
-        context.drawBorder(this.getX(), this.getBottom(), this.getWidth(), 1, Color.WHITE.getRGB()); // bottom
-        context.drawBorder(this.getX(), this.getY(), 1, this.getHeight() + 1, Color.WHITE.getRGB()); // left
-        context.drawBorder(this.getRight() - 1, this.getY() - 1, 1, this.getHeight() + 2, Color.WHITE.getRGB()); // right
+        context.drawBorder(this.getX(), this.getY() - 1, this.getWidth(), this.getHeight() + 2, Color.WHITE.getRGB()); // border
         RenderSystem.disableBlend();
     }
 
