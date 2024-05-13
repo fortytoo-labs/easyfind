@@ -8,7 +8,7 @@
 
   "easyfind.midnightconfig.title": "EasyFind Configuration",
   "easyfind.midnightconfig.showDescription": "Show item description",
-  "easyfind.midnightconfig.blurredBG": "Blurred Background",
+  "easyfind.midnightconfig.darkenBG": "Darken Background",
   "easyfind.midnightconfig.coloredRarity": "Colored rarity of item",
   "easyfind.midnightconfig.showDisabledItem": "Show disabled item",
   "easyfind.midnightconfig.saveHistory": "Save history of given items",

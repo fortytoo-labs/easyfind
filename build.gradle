@@ -37,7 +37,7 @@ dependencies {
     // MidnightLib
     modImplementation "maven.modrinth:midnightlib:${project.midnightlib_version}"
     include "maven.modrinth:midnightlib:${project.midnightlib_version}"
-    
+
     // Test env: Mod Menu
     modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
 
@@ -59,7 +59,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 17
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly

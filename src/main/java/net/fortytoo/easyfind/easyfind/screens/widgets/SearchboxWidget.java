@@ -46,8 +46,8 @@ public class SearchboxWidget extends TextFieldWidget {
     }
     
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderWidget(context, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
         if (this.placeholder != null && this.getText().isEmpty()) {
             context.drawTextWithShadow(
                     this.textRenderer, 

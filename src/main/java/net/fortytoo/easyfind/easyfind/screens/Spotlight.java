@@ -95,10 +95,13 @@ public class Spotlight extends Screen {
                 super.client,
                 resultBoxWidth,
                 resultBoxHeight,
-                resultBoxY
+                resultBoxY + 1,
+                resultBoxY + resultBoxHeight
         );
 
-        resultListWidget.setX(resultBoxX);
+        resultListWidget.setRenderBackground(false);
+        resultListWidget.setLeftPos(resultBoxX);
+        
         super.addDrawableChild(resultListWidget);
         
         this.updateResults();
@@ -106,9 +109,8 @@ public class Spotlight extends Screen {
     
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (ConfigAgent.blurredBG) this.applyBlur(delta);
-        this.renderDarkening(context);
-    }
+        if (ConfigAgent.darkenBG) super.renderBackground(context, mouseX, mouseY, delta);
+    }   
     
     @Override
     public void tick() {
@@ -155,7 +157,7 @@ public class Spotlight extends Screen {
         }
         
         if (!resultListWidget.children().isEmpty()) {
-            resultListWidget.setSelected(resultListWidget.children().getFirst());
+            resultListWidget.setSelected(resultListWidget.children().get(0));
         } else {
             resultListWidget.setSelected(null);
         }
