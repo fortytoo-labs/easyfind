@@ -6,7 +6,7 @@ public class ConfigAgent extends MidnightConfig {
     public enum ReplaceNeighbor { CURRENT, NEXT, PREVIOUS }
     
     // Cosmetics
-    @Entry(category = "text") public static boolean blurredBG = true;
+    @Entry(category = "text") public static boolean darkenBG = true;
     @Entry(category = "text") public static boolean showDescription = true;
     @Entry(category = "text") public static boolean coloredRarity = true;
     

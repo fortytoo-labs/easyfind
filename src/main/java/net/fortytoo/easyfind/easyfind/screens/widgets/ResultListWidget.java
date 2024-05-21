@@ -16,8 +16,13 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     final private Spotlight spotlight;
     final private int entryWidth;
     
-    public ResultListWidget(Spotlight screen, MinecraftClient minecraftClient, int width, int height, int y) {
-        super(minecraftClient, width, height, y, 24);
+    public ResultListWidget(Spotlight screen, 
+                            MinecraftClient minecraftClient, 
+                            int width, 
+                            int height, 
+                            int top,
+                            int bottom) {
+        super(minecraftClient, width, height, top, bottom, 24);
         this.spotlight = screen;
         this.entryWidth = width;
     }
@@ -35,37 +40,33 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     }
 
     @Override
-    protected void drawHeaderAndFooterSeparators(DrawContext context) {
-        RenderSystem.enableBlend();
-        context.drawBorder(this.getX(), this.getY() - 1, this.getWidth(), this.getHeight() + 2, Color.WHITE.getRGB()); // border
-        RenderSystem.disableBlend();
-    }
-
-    @Override
-    protected void drawMenuListBackground(DrawContext context) {
-        super.drawMenuListBackground(context);
+    protected int getScrollbarPositionX() {
+        return this.right - 6;
     }
     
     @Override
-    public void renderWidget(final DrawContext context, final int mouseX, final int mouseY, final float delta) {
+    public void render(final DrawContext context, final int mouseX, final int mouseY, final float delta) {
         // no history found
         if (spotlight.getSearchboxWidget().getText().isEmpty() && spotlight.getItemHistory().isEmpty()) return;
         
         // avoid displaying not found on blank search query
         if (spotlight.getSearchboxWidget().getText().isEmpty() && this.children().isEmpty()) return;
+
+        context.fill(this.left, this.top, this.right, this.bottom + 1, Color.BLACK.getRGB()); // background
+        context.drawBorder(this.left - 1, this.top - 1, this.width + 2, this.height + 2, Color.WHITE.getRGB()); // border
         
         if (this.children().isEmpty()) {
             final Text text = Text.translatable("efs.404");
             context.drawText(
                     this.client.textRenderer,
                     text,
-                    this.getX() + this.width / 2 - this.client.textRenderer.getWidth(text) / 2,
-                    this.getY() + this.height / 2 - 5,
+                    this.left + this.width / 2 - this.client.textRenderer.getWidth(text) / 2,
+                    this.top + this.height / 2 - 5,
                     Color.PINK.getRGB(),
                     true
             );
         }
-        super.renderWidget(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
     
     @Override
@@ -75,8 +76,8 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     
     @Override
     protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
-        int i = this.getX() + (this.width - entryWidth) / 2 - 14;
-        int j = this.getX() + (this.width + entryWidth) / 2 + (this.isScrollbarVisible() ? 8 : 14);
+        int i = this.left + (this.width - entryWidth) / 2 - 14;
+        int j = this.left + (this.width + entryWidth) / 2 + ((this.getMaxScroll() > 0) ? 8 : 14);
         context.fill(i, y - 2, j, y + entryHeight + 2, borderColor);
         context.fill(i + 1, y - 1, j - 1, y + entryHeight + 1, fillColor);
     }
@@ -88,7 +89,7 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
 
     // mouse click helper
     public int getEntryY(final double mouseY) {
-        return MathHelper.floor(mouseY - this.getY())
+        return MathHelper.floor(mouseY - this.top)
                 - this.headerHeight + (int) this.getScrollAmount() - 2;
     }
 
@@ -104,10 +105,10 @@ public class ResultListWidget extends AlwaysSelectedEntryListWidget<ResultWidget
     }
 
     public boolean isMouseOver(final double mouseX, final double mouseY) {
-        return mouseX >= this.getX()
-                && mouseX <= this.getX() + this.width
-                && mouseY >= this.getY()
-                && mouseY <= this.getY() + this.height;
+        return mouseX >= this.left
+                && mouseX <= this.left + this.width
+                && mouseY >= this.top
+                && mouseY <= this.top + this.height;
     }
 
     @Override

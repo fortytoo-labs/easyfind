@@ -4,7 +4,6 @@ import net.fortytoo.easyfind.easyfind.config.ConfigAgent;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -36,15 +35,15 @@ public class ResultWidget extends AlwaysSelectedEntryListWidget.Entry<ResultWidg
 
     @Override
     public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        final Rarity rarity = item.getComponents().get(DataComponentTypes.RARITY);
         final Text text;
         final ItemStack itemStack = new ItemStack(this.item);
+        final Rarity rarity = itemStack.getRarity();
         Text meta = Text.translatable(item.getTranslationKey() + ".desc").formatted(Formatting.GRAY);
         
         if (isEnabled) {
             assert rarity != null;
             text = Text.translatable(item.getTranslationKey())
-                    .formatted(ConfigAgent.coloredRarity ? rarity.getFormatting() : Formatting.WHITE);
+                    .formatted(ConfigAgent.coloredRarity ? rarity.formatting : Formatting.WHITE);
         }
         else {
             text = Text.translatable(item.getTranslationKey()).formatted(Formatting.STRIKETHROUGH, Formatting.GRAY);

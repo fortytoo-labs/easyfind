@@ -59,7 +59,7 @@ public class Spotlight extends Screen {
         if (client != null) {
             player = client.player;
         }
-
+        
         // TODO: change these
         final int resultBoxWidth = Math.min(super.width / 2, 300);
         final int resultBoxHeight = Math.min(super.height / 2, 300);
@@ -95,19 +95,23 @@ public class Spotlight extends Screen {
                 super.client,
                 resultBoxWidth,
                 resultBoxHeight,
-                resultBoxY
+                resultBoxY + 1,
+                resultBoxY + resultBoxHeight
         );
-
-        resultListWidget.setX(resultBoxX);
+        
+        resultListWidget.setRenderBackground(false);
+        resultListWidget.setRenderHorizontalShadows(false);
+        resultListWidget.setLeftPos(resultBoxX);
+        
         super.addDrawableChild(resultListWidget);
         
         this.updateResults();
     }
     
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (ConfigAgent.blurredBG) this.applyBlur(delta);
-        this.renderDarkening(context);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        if (ConfigAgent.darkenBG) this.renderBackground(context);
+        super.render(context, mouseX, mouseY, delta);
     }
     
     @Override
@@ -155,7 +159,7 @@ public class Spotlight extends Screen {
         }
         
         if (!resultListWidget.children().isEmpty()) {
-            resultListWidget.setSelected(resultListWidget.children().getFirst());
+            resultListWidget.setSelected(resultListWidget.children().get(0));
         } else {
             resultListWidget.setSelected(null);
         }
