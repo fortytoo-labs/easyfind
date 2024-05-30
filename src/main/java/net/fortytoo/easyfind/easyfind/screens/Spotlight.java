@@ -21,6 +21,7 @@ import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 import java.util.Queue;
@@ -35,6 +36,9 @@ public class Spotlight extends Screen {
 
     private String prevQuery;
     private Item lastClickItemEntry;
+    
+    private static int slot;
+    private boolean isShiftDown = false;
     
     private long lastClickTime;
     
@@ -126,32 +130,13 @@ public class Spotlight extends Screen {
         this.prevQuery = query;
         this.resultListWidget.children().clear();
         
+        // Item search
         if (query.isEmpty()) {
             if (!ConfigAgent.saveHistory) return;
-            this.itemHistory.getItemHistory().forEach(item -> {
-                boolean a = this.player.networkHandler.hasFeature(item.getRequiredFeatures());
-                if (!a && !ConfigAgent.showDisabledItem) return;
-                resultListWidget.children().add(
-                    new ResultWidget(
-                            super.textRenderer,
-                            item,
-                            a
-                    ));
-                }
-            );
+            this.itemHistory.getItemHistory().forEach(this::addToResult);
         }
         else {
-            FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> {
-                boolean a = this.player.networkHandler.hasFeature(item.getReferent().getRequiredFeatures());
-                if (!a && !ConfigAgent.showDisabledItem) return;
-                resultListWidget.children().add(
-                    new ResultWidget(
-                            super.textRenderer,
-                            item.getReferent(),
-                            a
-                    ));
-                }
-            );
+            FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> this.addToResult(item.getReferent()));
         }
         
         if (!resultListWidget.children().isEmpty()) {
@@ -161,6 +146,12 @@ public class Spotlight extends Screen {
         }
         
         resultListWidget.setScrollAmount(0);
+    }
+    
+    private void addToResult(Item item) {
+        boolean hasFeature = this.player.networkHandler.hasFeature(item.getRequiredFeatures());
+        if (!hasFeature && !ConfigAgent.showDisabledItem) return;
+        resultListWidget.children().add(new ResultWidget(super.textRenderer, item, hasFeature));
     }
 
     private void check(final BiConsumer<MinecraftClient, ResultWidget> entryConsumer) {
@@ -212,6 +203,12 @@ public class Spotlight extends Screen {
     }
     
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        this.isShiftDown = (modifiers & GLFW.GLFW_MOD_SHIFT) == GLFW.GLFW_MOD_SHIFT;
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+    
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.resultListWidget.isMouseOver(mouseX, mouseY)
                 && this.entryClickHandler(mouseY, button)) {
@@ -224,53 +221,52 @@ public class Spotlight extends Screen {
     public void giveItem() {
         this.check((client, entry) -> {
             assert client.player != null;
-            if (client.player.getAbilities().creativeMode) {
-                final Item item = entry.getItem();
-                if (client.player.networkHandler.hasFeature(item.getRequiredFeatures())) {
-                    final PlayerInventory inventory = client.player.getInventory();
-                    final ItemStack itemStack = new ItemStack(item);
-                    final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
-                    
-                    int slot;
+            if (!client.player.getAbilities().creativeMode) return;
+            
+            final Item item = entry.getItem();
+            if (client.player.networkHandler.hasFeature(item.getRequiredFeatures())) {
+                final PlayerInventory inventory = client.player.getInventory();
+                final ItemStack itemStack = new ItemStack(item);
+                final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
 
-                    if (ConfigAgent.saveHistory) this.itemHistory.push(item);
-                    
-                    // Check if player already has the item in the hotbar, if so, select them
-                    if (!ConfigAgent.ignoreExisting) {
-                        for (slot = 0; slot <= 8; slot++) {
-                            if (inventory.main.get(slot).isOf(item)) {
-                                inventory.selectedSlot = slot;
-                                this.close();
-                                return;
-                            }
+                if (ConfigAgent.saveHistory) this.itemHistory.push(item);
+                
+                // Check if player already has the item in the hotbar, if so, select them
+                if (!ConfigAgent.ignoreExisting) {
+                    for (slot = 0; slot <= 8; slot++) {
+                        if (inventory.main.get(slot).isOf(item)) {
+                            inventory.selectedSlot = slot;
+                            this.close();
+                            return;
                         }
                     }
-                    
-                    // Add to stack if there is an empty slot, replace selected if isn't
-                    final int emptySlot = inventory.getEmptySlot();
-                    if (ConfigAgent.forcedReplace) slot = inventory.selectedSlot;
-                    else if (emptySlot == -1 || emptySlot > 8) {
-                        slot = inventory.selectedSlot;
-                        slot = switch (ConfigAgent.replaceNeighbor) {
-                            case CURRENT -> slot;
-                            case NEXT -> slot + 1;
-                            case PREVIOUS -> slot - 1;
-                        };
-                        if (ConfigAgent.replaceNeighbor != ConfigAgent.ReplaceNeighbor.CURRENT)
-                            slot = switch (slot) {
-                                case -1 -> 8;
-                                case 9 -> 0;
-                                default -> slot;
-                            };
-                    }
-                    else slot = emptySlot;
-                    
-                    client.player.networkHandler.sendPacket(new CreativeInventoryActionC2SPacket(slot + 36, itemStack));
-                    inventory.selectedSlot = slot;
-                    
-                    client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
-                    this.close();
                 }
+                
+                // Add to stack if there is an empty slot, replace selected if isn't
+                final int emptySlot = inventory.getEmptySlot();
+                if (ConfigAgent.forcedReplace) slot = inventory.selectedSlot;
+                else if (emptySlot == -1 || emptySlot > 8) {
+                    slot = inventory.selectedSlot;
+                    slot = switch (ConfigAgent.replaceNeighbor) {
+                        case CURRENT -> slot;
+                        case NEXT -> slot + 1;
+                        case PREVIOUS -> slot - 1;
+                    };
+                    if (ConfigAgent.replaceNeighbor != ConfigAgent.ReplaceNeighbor.CURRENT)
+                        slot = switch (slot) {
+                            case -1 -> 8;
+                            case 9 -> 0;
+                            default -> slot;
+                        };
+                }
+                else slot = emptySlot;
+                
+                client.player.networkHandler.sendPacket(new CreativeInventoryActionC2SPacket(slot + 36, itemStack));
+                inventory.selectedSlot = slot;
+                
+                client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
+
+                this.close();
             }
         });
     }
@@ -289,6 +285,13 @@ public class Spotlight extends Screen {
 
     public Queue<Item> getItemHistory() {
         return itemHistory.getItemHistory();
+    }
+    
+    @Override
+    public void close() {
+        if (ConfigAgent.keepScreenOn == ConfigAgent.KeepScreen.SHIFT) {
+            if (!this.isShiftDown) super.close();
+        }
     }
 }
  

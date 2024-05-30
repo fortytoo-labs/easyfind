@@ -5,9 +5,10 @@ import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.minecraft.item.Item;
 
 import java.util.Collection;
+import java.util.List;
 
 public class FuzzyFind {
-    public static Collection<BoundExtractedResult<Item>> search(Collection<Item> itemList, final String query) {
+    public static List<BoundExtractedResult<Item>> search(Collection<Item> itemList, final String query) {
         return FuzzySearch.extractTop(
                 query,
                 itemList,
