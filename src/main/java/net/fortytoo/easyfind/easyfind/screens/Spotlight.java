@@ -15,11 +15,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
@@ -38,7 +34,6 @@ public class Spotlight extends Screen {
     private String prevQuery;
     private ResultWidget lastClickItemEntry;
     
-    private static int slot;
     private boolean isShiftDown = false;
     
     private long lastClickTime;
@@ -87,7 +82,7 @@ public class Spotlight extends Screen {
         this.searchboxWidget.setChangedListener(this::search);
         this.searchboxWidget.setResultConsumer((result, entry) -> {
             if (Objects.requireNonNull(result) == SearchResult.EXECUTE) {
-                this.giveItem();
+                this.execute();
             }
         });
         
@@ -123,6 +118,7 @@ public class Spotlight extends Screen {
         }
     }
     
+    // TODO: Extendable search
     private void search(final String query) {
         if (this.prevQuery != null && this.prevQuery.equals(query)) {
             return;
@@ -192,7 +188,7 @@ public class Spotlight extends Screen {
                     && this.lastClickItemEntry != null
                     && this.lastClickItemEntry.equals(selectedEntry.getEntry())) {
                 if (button == 0) {
-                    this.giveItem();
+                    this.execute();
                 }
                 return true;
             }
@@ -218,57 +214,15 @@ public class Spotlight extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
     
-    // TODO: Can I break these down to chunks of code?
-    public void giveItem() {
+    public void execute() {
         this.check((client, entry) -> {
             assert client.player != null;
-            if (!client.player.getAbilities().creativeMode) return;
             
-            final Item item = entry.getItem();
-            if (client.player.networkHandler.hasFeature(item.getRequiredFeatures())) {
-                final PlayerInventory inventory = client.player.getInventory();
-                final ItemStack itemStack = new ItemStack(item);
-                final float audioPitch = ((client.player.getRandom().nextFloat() - client.player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f;
-
-                if (ConfigAgent.saveHistory) this.itemHistory.push(item);
-                
-                // Check if player already has the item in the hotbar, if so, select them
-                if (!ConfigAgent.ignoreExisting) {
-                    for (slot = 0; slot <= 8; slot++) {
-                        if (inventory.main.get(slot).isOf(item)) {
-                            inventory.selectedSlot = slot;
-                            this.close();
-                            return;
-                        }
-                    }
-                }
-                
-                // Add to stack if there is an empty slot, replace selected if isn't
-                final int emptySlot = inventory.getEmptySlot();
-                if (ConfigAgent.forcedReplace) slot = inventory.selectedSlot;
-                else if (emptySlot == -1 || emptySlot > 8) {
-                    slot = inventory.selectedSlot;
-                    slot = switch (ConfigAgent.replaceNeighbor) {
-                        case CURRENT -> slot;
-                        case NEXT -> slot + 1;
-                        case PREVIOUS -> slot - 1;
-                    };
-                    if (ConfigAgent.replaceNeighbor != ConfigAgent.ReplaceNeighbor.CURRENT)
-                        slot = switch (slot) {
-                            case -1 -> 8;
-                            case 9 -> 0;
-                            default -> slot;
-                        };
-                }
-                else slot = emptySlot;
-                
-                client.player.networkHandler.sendPacket(new CreativeInventoryActionC2SPacket(slot + 36, itemStack));
-                inventory.selectedSlot = slot;
-                
-                client.player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, audioPitch);
-
-                this.close();
-            }
+            ItemEntry itemEntry = (ItemEntry) entry.getEntry();
+            
+            itemEntry.execute(client);
+            
+            this.close();
         });
     }
 
