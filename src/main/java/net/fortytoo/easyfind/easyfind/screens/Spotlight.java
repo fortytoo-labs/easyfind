@@ -6,6 +6,7 @@ import net.fortytoo.easyfind.easyfind.config.ConfigAgent;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultListWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.ResultWidget;
 import net.fortytoo.easyfind.easyfind.screens.widgets.SearchboxWidget;
+import net.fortytoo.easyfind.easyfind.screens.widgets.results.ItemEntry;
 import net.fortytoo.easyfind.easyfind.utils.FuzzyFind;
 import net.fortytoo.easyfind.easyfind.utils.ItemHistory;
 import net.fortytoo.easyfind.easyfind.utils.RegistryProvider;
@@ -35,7 +36,7 @@ public class Spotlight extends Screen {
     private final ItemHistory itemHistory;
 
     private String prevQuery;
-    private Item lastClickItemEntry;
+    private ResultWidget lastClickItemEntry;
     
     private static int slot;
     private boolean isShiftDown = false;
@@ -133,10 +134,10 @@ public class Spotlight extends Screen {
         // Item search
         if (query.isEmpty()) {
             if (!ConfigAgent.saveHistory) return;
-            this.itemHistory.getItemHistory().forEach(this::addToResult);
+            this.itemHistory.getItemHistory().forEach(this::addItemToResult);
         }
         else {
-            FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> this.addToResult(item.getReferent()));
+            FuzzyFind.search(RegistryProvider.getItems(), query).forEach(item -> this.addItemToResult(item.getReferent()));
         }
         
         if (!resultListWidget.children().isEmpty()) {
@@ -148,10 +149,10 @@ public class Spotlight extends Screen {
         resultListWidget.setScrollAmount(0);
     }
     
-    private void addToResult(Item item) {
+    private void addItemToResult(Item item) {
         boolean hasFeature = this.player.networkHandler.hasFeature(item.getRequiredFeatures());
         if (!hasFeature && !ConfigAgent.showDisabledItem) return;
-        resultListWidget.children().add(new ResultWidget(super.textRenderer, item, hasFeature));
+        resultListWidget.children().add(new ItemEntry(super.textRenderer, item, hasFeature));
     }
 
     private void check(final BiConsumer<MinecraftClient, ResultWidget> entryConsumer) {
@@ -167,7 +168,7 @@ public class Spotlight extends Screen {
 
     private void selectEntry(final ResultWidget entry) {
         this.resultListWidget.setSelected(entry);
-        if (!entry.getItem().equals(this.lastClickItemEntry)) {
+        if (!entry.getEntry().equals(this.lastClickItemEntry)) {
             this.lastClickItemEntry = null;
         }
     }
@@ -189,7 +190,7 @@ public class Spotlight extends Screen {
             final long timeMs = Util.getMeasuringTimeMs();
             if (timeMs - this.lastClickTime <= 420
                     && this.lastClickItemEntry != null
-                    && this.lastClickItemEntry.equals(selectedEntry.getItem())) {
+                    && this.lastClickItemEntry.equals(selectedEntry.getEntry())) {
                 if (button == 0) {
                     this.giveItem();
                 }
@@ -197,7 +198,7 @@ public class Spotlight extends Screen {
             }
 
             this.lastClickTime = timeMs;
-            this.lastClickItemEntry = selectedEntry.getItem();
+            this.lastClickItemEntry = selectedEntry.getEntry();
         }
         return false;
     }
@@ -217,7 +218,7 @@ public class Spotlight extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
     
-    // TODO: Configurable, also refactor this.
+    // TODO: Can I break these down to chunks of code?
     public void giveItem() {
         this.check((client, entry) -> {
             assert client.player != null;
@@ -290,8 +291,9 @@ public class Spotlight extends Screen {
     @Override
     public void close() {
         if (ConfigAgent.keepScreenOn == ConfigAgent.KeepScreen.SHIFT) {
-            if (!this.isShiftDown) super.close();
+            if (this.isShiftDown) return;
         }
+        super.close();
     }
 }
  

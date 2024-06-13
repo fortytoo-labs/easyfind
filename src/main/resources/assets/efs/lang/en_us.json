@@ -15,7 +15,7 @@
   
   "easyfind.midnightconfig.keepScreenOn": "Do not close after picked an item",
   "easyfind.midnightconfig.enum.KeepScreen.SHIFT": "Shift Only",
-  "easyfind.midnightconfig.enum.KeepScreen.ALWAYS": "Always",
+  "easyfind.midnightconfig.enum.KeepScreen.ALWAYS": "Always Close",
   
   "easyfind.midnightconfig.replaceNeighbor": "When hotbar is full, replace on the",
   "easyfind.midnightconfig.enum.ReplaceNeighbor.CURRENT": "Current slot",
