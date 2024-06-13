@@ -4,6 +4,7 @@ import eu.midnightdust.lib.config.MidnightConfig;
 
 public class ConfigAgent extends MidnightConfig {
     public enum ReplaceNeighbor { CURRENT, NEXT, PREVIOUS }
+    public enum KeepScreen { SHIFT, ALWAYS }
     
     // Cosmetics
     @Entry public static boolean darkBG = true;
@@ -12,8 +13,8 @@ public class ConfigAgent extends MidnightConfig {
     
     // Behaviour
     @Entry public static ReplaceNeighbor replaceNeighbor = ReplaceNeighbor.CURRENT;
+    @Entry public static KeepScreen keepScreenOn = KeepScreen.SHIFT;
     @Entry public static boolean forcedReplace = false;
     @Entry public static boolean ignoreExisting = false;
-    
     @Entry public static boolean saveHistory = true;
 }

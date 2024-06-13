@@ -23,6 +23,7 @@ import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 import java.util.Queue;
@@ -39,6 +40,9 @@ public class Spotlight extends Screen {
 
     private String prevQuery;
     private Item lastClickItemEntry;
+    
+    private static int slot;
+    private boolean isShiftDown = false;
     
     private long lastClickTime;
     
@@ -152,6 +156,7 @@ public class Spotlight extends Screen {
         this.prevQuery = query;
         this.resultListWidget.children().clear();
         
+        // Item search
         if (query.isEmpty()) {
             if (!ConfigAgent.saveHistory) return;
             this.itemHistory.getItemHistory().forEach(item -> {
@@ -234,6 +239,12 @@ public class Spotlight extends Screen {
     }
     
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        this.isShiftDown = (modifiers & GLFW.GLFW_MOD_SHIFT) == GLFW.GLFW_MOD_SHIFT;
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+    
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.resultListWidget.isMouseOver(mouseX, mouseY)
                 && this.entryClickHandler(mouseY, button)) {
@@ -309,6 +320,14 @@ public class Spotlight extends Screen {
 
     public Queue<Item> getItemHistory() {
         return itemHistory.getItemHistory();
+    }
+    
+    @Override
+    public void close() {
+        if (ConfigAgent.keepScreenOn == ConfigAgent.KeepScreen.SHIFT) {
+            if (this.isShiftDown) return;
+        }
+        super.close();
     }
 }
  
