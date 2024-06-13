@@ -13,6 +13,10 @@
   "easyfind.midnightconfig.showDisabledItem": "Show disabled item",
   "easyfind.midnightconfig.saveHistory": "Save history of given items",
   
+  "easyfind.midnightconfig.keepScreenOn": "Do not close after picked an item",
+  "easyfind.midnightconfig.enum.KeepScreen.SHIFT": "Shift Only",
+  "easyfind.midnightconfig.enum.KeepScreen.ALWAYS": "Always Close",
+  
   "easyfind.midnightconfig.replaceNeighbor": "When hotbar is full, replace on the",
   "easyfind.midnightconfig.enum.ReplaceNeighbor.CURRENT": "Current slot",
   "easyfind.midnightconfig.enum.ReplaceNeighbor.NEXT": "Next slot",
